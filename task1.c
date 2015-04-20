@@ -22,10 +22,30 @@ int main(int argc, char** argv) {
    }
 
    //read out the free memory
-	printf("testing ping\nBefore:\n\t");
+	int total_mem, free_mem, used_mem;
+	char * temp;
+	char * token;
+	printf("testing ping\nBefore:\n");
+   fgets(c,100,ifp);//total memory
+   temp = strdup(c);
+   int i;
+   for(i=0; i < 9; i++)
+		token = strsep(&temp, "  "); // had to repeat strsep for some reason
+   total_mem = atoi(token);
+   printf("\tTotal Memory: %d\n", total_mem);
+
+
+   //now get free memory
    fgets(c,100,ifp);
-   fgets(c,100,ifp);
-   printf("%s",c);
+   temp = strdup(c); 
+   for(i=0; i < 11; i++)
+		token = strsep(&temp, "  "); // had to repeat strsep for some reason
+   free_mem = atoi(token);
+   printf("\tFree Memory: %d\n", free_mem);
+
+   //calculate memory in use
+   used_mem = total_mem - free_mem;
+   printf("\tUsed Memory: %d\n", used_mem);
 
    //start some process
    
@@ -37,15 +57,28 @@ int main(int argc, char** argv) {
 
 	   sleep(1);//sleep a little so it doesn't check memory until after the process has been running a bit
 	   //rewind to the beginning of meminfo and read again
-	   printf("After:\n\t");
+	   printf("After:\n");
 	   rewind(ifp);
 	   fgets(c,100,ifp);
 	   fgets(c,100,ifp);
-	   printf("%s",c);
+	   temp = strdup(c); 
+	   for(i=0; i < 11; i++)
+			token = strsep(&temp, "  "); // had to repeat strsep for some reason
+	   free_mem = atoi(token);
+	   printf("\tFree Memory: %d\n", free_mem);
+
+	   //calculate memory in use
+	   int old_used_mem = used_mem;
+	   used_mem = total_mem - free_mem;
+	   printf("\tUsed Memory: %d\n", used_mem);
+	   printf("\tMemory Used By Process: %d\n", used_mem-old_used_mem);
+
+	   
 
 
-	   fclose(ifp);
+	  
    }
 
+    fclose(ifp);
     return 0;
 }
