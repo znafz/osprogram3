@@ -17,39 +17,15 @@ Run with:  ./task3
 #include <unistd.h>
 #include <syslog.h>
 #include <string.h>
+#include <time.h>
+#include <math.h>
 
 int main(int argc, char** argv) {
-	pid_t pid, sid;
-
-	pid = fork();
-
-	if (pid < 0) {
-		printf("Error!\n");
-		exit(1);
-	} else if (pid > 0) {
-		/* Parent */
-		exit(0);
-	}
-	printf("\nAttempting to daemonize process...\n");
-
-	sid = setsid();		// Sets a new session ID; isolates daemon from terminal
-	if (sid < 0) exit(1);
-
-	// Change working directory to root
-	if (chdir("/") < 0) exit(1);
-
-	// Close out the standard file descriptors
-	//close(STDIN_FILENO);
-	//close(STDOUT_FILENO);
-	close(STDERR_FILENO);
-
-	printf("Successfully daemonized process.\n\n");
-
-	/* Declarations for memory monitoring */
-	int total_mem, free_mem, used_mem;
-	int i;
-	char * temp;
-	char * token;
+	/* Timing stuff */
+	clock_t start = clock(), diff;
+	int msec;
+	//How to get time:
+	//msec = diff * 1000 / CLOCKS_PER_SEC;
 
 	FILE *ifp = fopen("/proc/meminfo", "r");
 	char c[1000];
@@ -57,37 +33,84 @@ int main(int argc, char** argv) {
 		printf("Error opening file");
 		exit(1);         /* Program exits if file pointer returns NULL. */
 	}
+
+	int total_mem, free_mem, used_mem;
+	char * temp;
+	char * token;
+	printf("Testing...\nBefore:\n");
+	fgets(c, 100, ifp);//total memory
+	temp = strdup(c);
+	int i;
+	for (i = 0; i < 9; i++)
+		token = strsep(&temp, "  "); // had to repeat strsep for some reason
+	total_mem = atoi(token);
+	printf("\tTotal Memory: %d\n", total_mem);
+
+
+	//now get free memory
+	fgets(c, 100, ifp);
+	temp = strdup(c);
+	for (i = 0; i < 11; i++)
+		token = strsep(&temp, "  "); // had to repeat strsep for some reason
+	free_mem = atoi(token);
+	printf("\tFree Memory: %d\n", free_mem);
+
+	//calculate memory in use
+	used_mem = total_mem - free_mem;
+	printf("\tUsed Memory: %d\n", used_mem);
+
+	int flag = 10;
 	
+	if (fork() == 0) {
+		// temporary, for debugging the segfault
+		exit(1);
+		while (flag--) {
+			sleep(1);	// Reduce memory usage of memory watcher...
+			// "Lap" the clock in diff; every 5 seconds, 
+			if (((diff = clock() - start) * 1000 / CLOCKS_PER_SEC) % 5 == 0) {
 
+				/* Do memory watching stuff */
+				printf("CHECK %d\n", flag);
+				rewind(ifp);
+				fgets(c, 100, ifp);
+				fgets(c, 100, ifp);
+				temp = strdup(c);
+				for (i = 0; i < 11; i++)
+					token = strsep(&temp, "  "); // had to repeat strsep for some reason
+				free_mem = atoi(token);
+				printf("\tFree Memory: %d\n", free_mem);
 
-	while (1) {
-		/* Do stuff to monitor memory */
+				//calculate memory in use
+				int old_used_mem = used_mem;
+				used_mem = total_mem - free_mem;
+				printf("\tUsed Memory: %d\n", used_mem);
+				printf("\tMemory Used By Process: %d\n", used_mem - old_used_mem);
 
-		/* Before */
+			}
 
-		fgets(c, 100, ifp);		// Total memory
-		temp = strdup(c);
-
-		for (i = 0; i < 9; i++) token = strsep(&temp, "  ");
-
-		total_mem = atoi(token);
-		printf("\tTotal Memory: %d\n", total_mem);
-
-		// Now get free memory
-		fgets(c, 100, ifp);
-		temp = strdup(c);
-
-		for (i = 0; i < 11; i++) token = strsep(&temp, "  ");
-
-		free_mem = atoi(token);
-		printf("\tFree Memory: %d\n", free_mem);
-
-		// Calculate memory in use
-		used_mem = total_mem - free_mem;
-		printf("\tUsed Memory: %d\n", used_mem);
-
-		sleep(30);	// Wait 30 seconds
+		}
+		
+		exit(1);
+	} else {
+		printf("\nPARENT\n\n");
+		flag = 50;
+		int i, j, k, ugh;
+		ugh = 1;
+		while (flag--) {
+			for (i = 0; i < 10; i++) {
+				printf("ugh... \n");
+				for (k = 1; k <= 50; k++) {
+					if (k % 20 == 0) printf("\n");
+					printf("%d ", ugh++);
+				}
+				printf("\n");
+			}
+		}
+		printf("ugh = %d\n", ugh);
+		//exit(1);
 	}
+
+	printf("\n\nugh\n\n");
 
 	return 0;
 }
