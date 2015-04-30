@@ -21,11 +21,6 @@ Run with:  ./task3
 #include <math.h>
 
 int main(int argc, char** argv) {
-	/* Timing stuff */
-	clock_t start = clock(), diff;
-	int msec;
-	//How to get time:
-	//msec = diff * 1000 / CLOCKS_PER_SEC;
 
 	FILE *ifp = fopen("/proc/meminfo", "r");
 	char c[1000];
@@ -62,34 +57,26 @@ int main(int argc, char** argv) {
 	int flag = 10;
 	
 	if (fork() == 0) {
-		// temporary, for debugging the segfault
-		exit(1);
 		while (flag--) {
 			sleep(1);	// Reduce memory usage of memory watcher...
-			// "Lap" the clock in diff; every 5 seconds, 
-			if (((diff = clock() - start) * 1000 / CLOCKS_PER_SEC) % 5 == 0) {
+			printf("CHECK %d\n", flag);
+			rewind(ifp);
+			fgets(c, 100, ifp);
+			fgets(c, 100, ifp);
+			temp = strdup(c);
+			for (i = 0; i < 11; i++)
+				token = strsep(&temp, "  "); // had to repeat strsep for some reason
+			free_mem = atoi(token);
+			printf("\tFree Memory: %d\n", free_mem);
 
-				/* Do memory watching stuff */
-				printf("CHECK %d\n", flag);
-				rewind(ifp);
-				fgets(c, 100, ifp);
-				fgets(c, 100, ifp);
-				temp = strdup(c);
-				for (i = 0; i < 11; i++)
-					token = strsep(&temp, "  "); // had to repeat strsep for some reason
-				free_mem = atoi(token);
-				printf("\tFree Memory: %d\n", free_mem);
-
-				//calculate memory in use
-				int old_used_mem = used_mem;
-				used_mem = total_mem - free_mem;
-				printf("\tUsed Memory: %d\n", used_mem);
-				printf("\tMemory Used By Process: %d\n", used_mem - old_used_mem);
-
-			}
+			//calculate memory in use
+			int old_used_mem = used_mem;
+			used_mem = total_mem - free_mem;
+			printf("\tUsed Memory: %d\n", used_mem);
+			printf("\tMemory Used By Process: %d\n", used_mem - old_used_mem);
 
 		}
-		
+		fclose(ifp);
 		exit(1);
 	} else {
 		printf("\nPARENT\n\n");
@@ -97,17 +84,16 @@ int main(int argc, char** argv) {
 		int i, j, k, ugh;
 		ugh = 1;
 		while (flag--) {
-			for (i = 0; i < 10; i++) {
-				printf("ugh... \n");
-				for (k = 1; k <= 50; k++) {
-					if (k % 20 == 0) printf("\n");
-					printf("%d ", ugh++);
+			for (i = 0; i < 1000; i++) {
+				for (k = 1; k <= 1000; k++) {
+					for (j = 0; j < 10000; j++) {
+						ugh += 1;
+					}
 				}
-				printf("\n");
 			}
 		}
-		printf("ugh = %d\n", ugh);
-		//exit(1);
+		fclose(ifp);
+		exit(1);
 	}
 
 	printf("\n\nugh\n\n");
