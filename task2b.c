@@ -3,8 +3,8 @@
   Course:  COMP 340, Operating Systems
   Date:    10 March 2015
   Description:   
-  Compile with:  gcc -o task2 task1.c -lm
-  Run with:  ./task2
+  Compile with:  gcc -o task2b task2b.c -lm
+  Run with:  ./task2b
 
 */
 
@@ -94,8 +94,8 @@ int main(int argc, char** argv) {
 		   
 			   if(fork() == 0){
 					usleep(2000000);
-					printf("executing process 3..\n");
-					expensiveFunction(3);
+					printf("executing process 3 with execv..\n");
+					execv("ping", "ping google.com");
 	   
 		   } else{
 
