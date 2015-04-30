@@ -8,8 +8,24 @@
 
 */
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h> /* For exit() function*/
+
+void expensiveFunction(int x){
+	int i;
+	float sum = 0;
+	for(i = 0; i < 5000; i++)
+	{
+		int j;
+		for(j = 0; j < 5000; j++)
+		{
+			sum += cos((float)(i))/sin((float)(j));
+		}
+		sum /= cos(sum);
+	}
+	printf("finished expensive function %d.\n", x);
+}
 
 int main(int argc, char** argv) {
 
@@ -51,11 +67,11 @@ int main(int argc, char** argv) {
    
    if(fork() == 0){
 	   
-	   execv("ping", "ping google.com");
+	   expensiveFunction(1);
 	   
    } else{
 
-	   sleep(1);//sleep a little so it doesn't check memory until after the process has been running a bit
+	   usleep(10000);//sleep a little so it doesn't check memory until after the process has been running a bit
 	   //rewind to the beginning of meminfo and read again
 	   printf("After:\n");
 	   rewind(ifp);
