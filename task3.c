@@ -59,16 +59,18 @@ int main(int argc, char** argv) {
 	used_mem = total_mem - free_mem;
 	printf("\tUsed Memory: %d\n", used_mem);
 
-	int flag = 500;
+	int flag = 10;
 	
 	if (fork() == 0) {
+		// temporary, for debugging the segfault
+		exit(1);
 		while (flag--) {
-			//sleep(1);	// Reduce memory usage of memory watcher...
+			sleep(1);	// Reduce memory usage of memory watcher...
 			// "Lap" the clock in diff; every 5 seconds, 
 			if (((diff = clock() - start) * 1000 / CLOCKS_PER_SEC) % 5 == 0) {
 
 				/* Do memory watching stuff */
-				//printf("\nCHECK %d\n", flag);
+				printf("CHECK %d\n", flag);
 				rewind(ifp);
 				fgets(c, 100, ifp);
 				fgets(c, 100, ifp);
@@ -76,14 +78,13 @@ int main(int argc, char** argv) {
 				for (i = 0; i < 11; i++)
 					token = strsep(&temp, "  "); // had to repeat strsep for some reason
 				free_mem = atoi(token);
-				//printf("\tFree Memory: %d\n", free_mem);
+				printf("\tFree Memory: %d\n", free_mem);
 
 				//calculate memory in use
 				int old_used_mem = used_mem;
 				used_mem = total_mem - free_mem;
-				//printf("\tUsed Memory: %d\n", used_mem);
-				if (used_mem - old_used_mem)
-					printf("\tMemory Used By Process: %d\n", used_mem - old_used_mem);
+				printf("\tUsed Memory: %d\n", used_mem);
+				printf("\tMemory Used By Process: %d\n", used_mem - old_used_mem);
 
 			}
 
@@ -92,28 +93,24 @@ int main(int argc, char** argv) {
 		exit(1);
 	} else {
 		printf("\nPARENT\n\n");
-		//sleep(1);
 		flag = 50;
 		int i, j, k, ugh;
 		ugh = 1;
 		while (flag--) {
 			for (i = 0; i < 10; i++) {
-				//printf("ugh... \n");
+				printf("ugh... \n");
 				for (k = 1; k <= 50; k++) {
-					//if (k % 20 == 0) printf("\n");
-					//printf("%d ", ugh++);
-					for (j = 0; j < 1000; j++) {
-						ugh *= 1;
-					}
+					if (k % 20 == 0) printf("\n");
+					printf("%d ", ugh++);
 				}
-				//printf("\n");
+				printf("\n");
 			}
 		}
 		printf("ugh = %d\n", ugh);
-		exit(1);
+		//exit(1);
 	}
 
-	printf("\n\n\n\n\nugh\n\n");
+	printf("\n\nugh\n\n");
 
 	return 0;
 }
