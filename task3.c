@@ -28,19 +28,12 @@ int get_file_value(FILE * ifp, int target) {
 	/* If target == 1, looking for MemFree
 	   If target == 0, looking for MemTotal */
 
-	//fgets(c, 40, ifp);		// Gets whole line
-	//temp = strdup(c);		// Temporary file to work with
-	//name = strsep(&temp, ':')
-
 	fscanf(ifp, "%s %d", name, &value);		// Get number & "Kb"
 	fgets(trash, 50, ifp);
-
-	if (!target) printf("\t%s %d\n", name, value);
 
 	if (target) {
 		fscanf(ifp, "%s %d", name, &value);		// Get number & "Kb"
 		fgets(trash, 50, ifp);
-		printf("\t%s %d\n", name, value);
 	}
 
 	rewind(ifp);
@@ -51,31 +44,12 @@ int get_file_value(FILE * ifp, int target) {
 int main(int argc, char** argv) {
 
 	FILE *ifp = fopen("/proc/meminfo", "r");
-	//char c[1000];
+
 	if (ifp == NULL) {
 		printf("Error opening file");
 		exit(1);         /* Program exits if file pointer returns NULL. */
 	}
 
-	//char * temp;
-	//char * token;
-	//printf("Testing...\nBefore:\n");
-	//fgets(c, 100, ifp);//total memory
-	//temp = strdup(c);
-	//int i;
-	//for (i = 0; i < 9; i++)
-	//	token = strsep(&temp, " "); // had to repeat strsep for some reason
-	//total_mem = atoi(token);
-	//printf("\tTotal Memory: %d\n", total_mem);
-
-
-	////now get free memory
-	//fgets(c, 100, ifp);
-	//temp = strdup(c);
-	//for (i = 0; i < 11; i++)
-	//	token = strsep(&temp, " "); // had to repeat strsep for some reason
-	//free_mem = atoi(token);
-	//printf("\tFree Memory: %d\n", free_mem);
 	int i;
 	int total_mem, free_mem, used_mem;
 
