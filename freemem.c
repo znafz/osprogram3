@@ -8,12 +8,13 @@
 
   */
 
+#define LIMIT 0.85
 
 #include <stdio.h>
 #include <stdlib.h> /* For exit() function*/
 
-int get_file_value(FILE * ifp, int target) {
-	int value = 0;
+double get_file_value(FILE * ifp, int target) {
+	int value = 0.0;
 	char name[15];
 	char trash[100];
 
@@ -30,7 +31,7 @@ int get_file_value(FILE * ifp, int target) {
 
 	rewind(ifp);
 
-	return value;
+	return (double)value;
 }
 
 int main(int argc, char** argv) {
@@ -43,20 +44,27 @@ int main(int argc, char** argv) {
 		exit(1);         /* Program exits if file pointer returns NULL. */
 	}
 
-	int total_mem, free_mem, used_mem;
+	double total_mem, free_mem, used_mem, percentage;
+	int flag = 10;
 
-	//read out the free memory
-	total_mem = get_file_value(ifp, 0);
-	printf("\tTotal Memory: %d\n", total_mem);
+	while (flag) {
+		total_mem = get_file_value(ifp, 0);	//total memory
+		free_mem = get_file_value(ifp, 1);	//now get free memory
+		used_mem = total_mem - free_mem;	//calculate memory in use
 
-	//now get free memory
-	free_mem = get_file_value(ifp, 1);
-	printf("\tFree Memory: %d\n", free_mem);
+		printf("\n\tTotal:\t%.0f\n\tFree:\t%.0f\n\tUsed:\t%.0f\n", total_mem, free_mem, used_mem);
 
-	//calculate memory in use
-	used_mem = total_mem - free_mem;
-	printf("\tUsed Memory: %d\n", used_mem);
+		percentage = (used_mem / total_mem) * 100;
 
+		printf("\t----- Used: %.0f%% -----\n", percentage);
+		if (used_mem / total_mem > LIMIT) {
+			// Memory limit exceeded
+			printf("Memory limit of %.0f%% reached.\n", LIMIT * 100);
+		}
+
+		sleep(1);
+		flag--;
+	}
 
 	fclose(ifp);
 	return 0;
