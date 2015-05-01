@@ -23,12 +23,9 @@ int get_file_value(FILE * ifp, int target) {
 	fscanf(ifp, "%s %d", name, &value);		// Get number & "Kb"
 	fgets(trash, 50, ifp);
 
-	if (!target) printf("\t%s %d\n", name, value);
-
 	if (target) {
 		fscanf(ifp, "%s %d", name, &value);		// Get number & "Kb"
 		fgets(trash, 50, ifp);
-		printf("\t%s %d\n", name, value);
 	}
 
 	rewind(ifp);
