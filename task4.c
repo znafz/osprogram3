@@ -1,18 +1,17 @@
 /*
-  Author:  Zach Nafziger and Aaron Rosenberger
-  Course:  COMP 340, Operating Systems
-  Date:    10 March 2015
-  Description:
-  Compile with:  gcc -o freemem freemem.c
-  Run with:  ./freemem
+Author:  Zach Nafziger and Aaron Rosenberger
+Course:  COMP 340, Operating Systems
+Date:    10 March 2015
+Description: Ends user processes when memory allocation exceeds given limit.
+Compile with:  gcc -o task4 task4.c
+Run with:  ./task4
 
-  */
+*/
 
 #define LIMIT 0.85
 
 #include <stdio.h>
 #include <stdlib.h> /* For exit() function*/
-#include <time.h>
 
 double get_file_value(FILE * ifp, int target) {
 	int value = 0.0;
@@ -37,9 +36,6 @@ double get_file_value(FILE * ifp, int target) {
 
 int main(int argc, char** argv) {
 
-	clock_t start = clock();
-	int current_time;
-
 	//first open meminfo
 	FILE *ifp = fopen("/proc/meminfo", "r");
 
@@ -49,18 +45,14 @@ int main(int argc, char** argv) {
 	}
 
 	double total_mem, free_mem, used_mem, percentage;
+	int flag = 10;
 
-	system("clear");
-
-	while (1) {
-		total_mem = get_file_value(ifp, 0);	// /proc/meminfo:MemTotal
-		free_mem = get_file_value(ifp, 1);	// /proc/meminfo:MemFree
+	while (flag) {
+		total_mem = get_file_value(ifp, 0);	//total memory
+		free_mem = get_file_value(ifp, 1);	//now get free memory
 		used_mem = total_mem - free_mem;	//calculate memory in use
-		
-		printf("\033[7A"); // Move up 7 lines
-		printf("\033[10D"); // Move left 10 columns
+
 		printf("\n\tTotal:\t%.0f\n\tFree:\t%.0f\n\tUsed:\t%.0f\n", total_mem, free_mem, used_mem);
-		printf("\tTime: %d\n", clock() / CLOCKS_PER_SEC);
 
 		percentage = (used_mem / total_mem) * 100;
 
@@ -68,10 +60,12 @@ int main(int argc, char** argv) {
 		if (used_mem / total_mem > LIMIT) {
 			// Memory limit exceeded
 			printf("Memory limit of %.0f%% reached.\n", LIMIT * 100);
-		}
-		
-		if (clock() / CLOCKS_PER_SEC >= 15) exit(0);
 
+			// Now kill user processes... TODO!
+		}
+
+		sleep(1);
+		flag--;
 	}
 
 	fclose(ifp);

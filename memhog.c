@@ -33,11 +33,11 @@ void expensiveFunction(){
 
 int main(int argc, char** argv) {
 
-   int pid;
+	int pid;
 	int numChildren = 5; //change this to change number of forked children
 	int procNum;
 
-	for(procNum = 0; procNum < numChildren; procNum++) {
+	/*for(procNum = 0; procNum < numChildren; procNum++) {
 		pid = fork();
 		if (pid == 0) {
 			break;
@@ -49,6 +49,7 @@ int main(int argc, char** argv) {
 	}
 	else {
 		exit(1);
-	}
+	}*/
+	expensiveFunction();
     return 0;
 }
