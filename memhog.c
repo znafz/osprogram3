@@ -21,10 +21,13 @@ void expensiveFunction(){
 		int j;
 		for(j = 0; j < 9000; j++)
 		{
-			sum += cos((float)(i))/sin((float)(j));
+			sum += cos((float)(i))/sin((float)(j));//do some expensive calculations
+			malloc(i*j*1000);//allocate to memory
 		}
 		sum /= cos(sum);
+		
 	}
+
 	printf("finished expensive function.\n");
 }
 
