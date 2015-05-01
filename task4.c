@@ -68,14 +68,9 @@ int main(int argc, char** argv) {
 		if (1/*used_mem / total_mem > LIMIT*/) {
 			// Memory limit exceeded
 			printf("Memory limit of %.0f%% reached.\n", LIMIT * 100);
-
-			// Now kill user processes...
-			if (fork() == 0) {
-				//system("gcc -o memhog memhog.c -lm");
-				//system("./memhog");
-				//system("pkill ping");
-				//exit(1);
-			}
+			if (fork() == 0) /*system("pkill memhog");*/ printf("Killed stuff\n");
+			else sleep(1);
+			break;
 		}
 
 		if (clock() / CLOCKS_PER_SEC >= 15) exit(0);
@@ -85,6 +80,7 @@ int main(int argc, char** argv) {
 	fclose(ifp);
 	return 0;
 }
+
 
 
 
