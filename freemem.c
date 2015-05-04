@@ -38,7 +38,6 @@ double get_file_value(FILE * ifp, int target) {
 int main(int argc, char** argv) {
 
 	clock_t start = clock();
-	int current_time;
 
 	//first open meminfo
 	FILE *ifp = fopen("/proc/meminfo", "r");
@@ -49,28 +48,29 @@ int main(int argc, char** argv) {
 	}
 
 	double total_mem, free_mem, used_mem, percentage;
-
-	system("clear");
-
+	
 	while (1) {
 		total_mem = get_file_value(ifp, 0);	// /proc/meminfo:MemTotal
 		free_mem = get_file_value(ifp, 1);	// /proc/meminfo:MemFree
 		used_mem = total_mem - free_mem;	//calculate memory in use
 		
-		printf("\033[7A"); // Move up 7 lines
-		printf("\033[10D"); // Move left 10 columns
-		printf("\n\tTotal:\t%.0f\n\tFree:\t%.0f\n\tUsed:\t%.0f\n", total_mem, free_mem, used_mem);
-		printf("\tTime: %d\n", clock() / CLOCKS_PER_SEC);
+		//printf("\033[7A"); // Move up 7 lines
+		//printf("\033[10D"); // Move left 10 columns
+		system("clear");
+		printf("\n\tTotal:\t%.0f\tFree:\t%.0f\tUsed:\t%.0f", total_mem, free_mem, used_mem);
+		printf("\tTime: %d", clock() / CLOCKS_PER_SEC);
 
 		percentage = (used_mem / total_mem) * 100;
 
-		printf("\t----- Used: %.0f%% -----\n", percentage);
+		printf("\n\t----- Used: %.0f%% -----\n", percentage);
 		if (used_mem / total_mem > LIMIT) {
 			// Memory limit exceeded
 			printf("Memory limit of %.0f%% reached.\n", LIMIT * 100);
 		}
 		
 		if (clock() / CLOCKS_PER_SEC >= 15) exit(0);
+
+		sleep(1);
 
 	}
 

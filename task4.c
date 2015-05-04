@@ -48,35 +48,51 @@ int main(int argc, char** argv) {
 		exit(1);         /* Program exits if file pointer returns NULL. */
 	}
 
-	double total_mem, free_mem, used_mem, percentage;
+	double total_mem = 0.0, free_mem = 0.0, used_mem = 0.0, percentage = 0.0;
+	double total_temp, free_temp, used_temp;
 
 	system("clear");
 
 	while (1) {
+		total_temp = total_mem;
+		free_temp = free_mem;
+		used_temp = used_mem;
 		total_mem = get_file_value(ifp, 0);	// /proc/meminfo:MemTotal
 		free_mem = get_file_value(ifp, 1);	// /proc/meminfo:MemFree
 		used_mem = total_mem - free_mem;	//calculate memory in use
 
-		printf("\033[7A"); // Move up 7 lines
+		if (total_mem - total_temp > 0 ||
+			free_mem - free_temp > 0 ||
+			used_mem - used_temp > 0) {
+			printf("\033[7A"); // Move up 7 lines
+			printf("\033[10D"); // Move left 10 columns
+			printf("\n\tTotal:\t%.0f\n\tFree:\t%.0f\n\tUsed:\t%.0f\n", total_mem, free_mem, used_mem);
+			percentage = (used_mem / total_mem) * 100;
+			printf("\t----- Used: %.0f%% -----\n\n", percentage);
+		}
+		
 		printf("\033[10D"); // Move left 10 columns
-		printf("\n\tTotal:\t%.0f\n\tFree:\t%.0f\n\tUsed:\t%.0f\n", total_mem, free_mem, used_mem);
-		printf("\tTime: %d\n", clock() / CLOCKS_PER_SEC);
+		printf("\tTime: %d", clock() / CLOCKS_PER_SEC);
 
-		percentage = (used_mem / total_mem) * 100;
-
-		printf("\t----- Used: %.0f%% -----\n", percentage);
-		if (1/*used_mem / total_mem > LIMIT*/) {
+		if (used_mem / total_mem > LIMIT) {
 			// Memory limit exceeded
-			printf("Memory limit of %.0f%% reached.\n", LIMIT * 100);
-			if (fork() == 0) /*system("pkill memhog");*/ printf("Killed stuff\n");
+			printf("\nMemory limit of %.0f%% reached.\n", LIMIT * 100);
+			if (fork() == 0) {
+				if (execv("pkill", "pkill memhog") == -1) {
+					printf("Error with pkill\n");
+					exit(1);
+				}
+				printf("Killed stuff\n");
+				break;
+			}
 			else sleep(1);
-			break;
 		}
 
-		if (clock() / CLOCKS_PER_SEC >= 15) exit(0);
+		if (clock() / CLOCKS_PER_SEC >= 15) break;
 
 	}
 
+	system("clear");
 	fclose(ifp);
 	return 0;
 }
