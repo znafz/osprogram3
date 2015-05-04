@@ -3,7 +3,7 @@
   Course:  COMP 340, Operating Systems
   Date:    10 March 2015
   Description:   
-  Compile with:  gcc -o task1 task1.c
+  Compile with:  gcc -o task1 task1.c -lm
   Run with:  ./task1
 
 */
@@ -12,15 +12,16 @@
 #include <stdio.h>
 #include <stdlib.h> /* For exit() function*/
 
-void expensiveFunction(int x){
+void expensiveFunction(int x){ // an expensive function to test/strain memory usage
 	int i;
 	float sum = 0;
+	//creating lots of loops so it takes a bit to run
 	for(i = 0; i < 5000; i++)
 	{
 		int j;
 		for(j = 0; j < 5000; j++)
 		{
-			sum += cos((float)(i))/sin((float)(j));
+			sum += cos((float)(i))/sin((float)(j));//sin and cos and division are all fairly expensive operations
 		}
 		sum /= cos(sum);
 	}
@@ -30,7 +31,7 @@ void expensiveFunction(int x){
 int main(int argc, char** argv) {
 
 	//first open meminfo
-    FILE *ifp = fopen("/proc/meminfo", "r");
+    FILE *ifp = fopen("/proc/meminfo", "r");//opening meminfo
 	char c[1000];
     if (ifp==NULL){
        printf("Error opening file");
@@ -46,8 +47,8 @@ int main(int argc, char** argv) {
    temp = strdup(c);
    int i;
    for(i=0; i < 9; i++)
-		token = strsep(&temp, "  "); // had to repeat strsep for some reason
-   total_mem = atoi(token);
+		token = strsep(&temp, "  "); // had to repeat strsep to get to the right place in the file
+   total_mem = atoi(token); // convert it to an integer
    printf("\tTotal Memory: %d\n", total_mem);
 
 
@@ -55,7 +56,7 @@ int main(int argc, char** argv) {
    fgets(c,100,ifp);
    temp = strdup(c); 
    for(i=0; i < 11; i++)
-		token = strsep(&temp, "  "); // had to repeat strsep for some reason
+		token = strsep(&temp, "  ");//same thing as before pretty much
    free_mem = atoi(token);
    printf("\tFree Memory: %d\n", free_mem);
 
@@ -67,7 +68,7 @@ int main(int argc, char** argv) {
    
    if(fork() == 0){
 	   
-	   expensiveFunction(1);
+	   expensiveFunction(1);//starting the expensive function
 	   
    } else{
 
@@ -79,7 +80,7 @@ int main(int argc, char** argv) {
 	   fgets(c,100,ifp);
 	   temp = strdup(c); 
 	   for(i=0; i < 11; i++)
-			token = strsep(&temp, "  "); // had to repeat strsep for some reason
+			token = strsep(&temp, "  ");
 	   free_mem = atoi(token);
 	   printf("\tFree Memory: %d\n", free_mem);
 
@@ -95,6 +96,6 @@ int main(int argc, char** argv) {
 	  
    }
 
-    fclose(ifp);
+    fclose(ifp);//close the file and exit the program
     return 0;
 }

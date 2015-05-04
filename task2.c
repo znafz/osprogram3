@@ -32,7 +32,7 @@ int get_file_value(FILE * ifp, int target) {
 	return value;
 }
 
-void expensiveFunction(int x){
+void expensiveFunction(int x){ //same expensive function as task 1
 	int i;
 	float sum = 0;
 	for(i = 0; i < 5000; i++)
@@ -47,7 +47,7 @@ void expensiveFunction(int x){
 	printf("finished expensive function %d.\n", x);
 }
 
-void expensiveFunction2(int x){
+void expensiveFunction2(int x){ //so we can make unidentical children
 	int i;
 	float sum = 0;
 	for(i = 0; i < 5000; i++)
@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
 
    //start some processes
    
-   if(fork() == 0){
+   if(fork() == 0){ //all 3 forks 
 	   printf("executing process 1..\n");
 	   expensiveFunction(1);
 	   
